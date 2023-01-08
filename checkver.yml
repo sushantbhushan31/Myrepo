@@ -1,0 +1,9 @@
+---
+- name: Checking verson of OS
+  hosts: all
+  tasks:
+     - name: Checking the OS version
+       command: "cat /etc/redhat-release"
+       register: var
+     - debug:
+             var.stdline_out

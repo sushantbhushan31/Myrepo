@@ -1,0 +1,41 @@
+---
+- name: Install Zabbix Agent on the Basis of OS
+  hosts: all
+  tasks:
+    - name: Copy agent binary on target
+      copy:
+        src: /root/zabbix-agent_6.0.3-1+ubuntu22.04_amd64.deb
+        dest: /root/
+      when: ansible_facts['distribution_major_version'] == "22"
+    - name: Install zabbix agent on Ubuntu 22
+      apt:
+        deb: /root/zabbix-agent_6.0.3-1+ubuntu22.04_amd64.deb
+        state: present
+      when: ansible_facts['distribution_major_version'] == "22"
+    - name: Copy Zabbix-agent package on RHEL 8
+      copy:
+        src: /root/zabbix-agent-6.0.3-1.el8.x86_64.rpm
+        dest: /root/
+      when: ansible_facts['distribution_major_version'] == "8"
+    - name: Install Zabbix agent on Centos 8
+      yum:
+        name: /root/zabbix-agent-6.0.3-1.el8.x86_64.rpm
+        state: present
+        disable_gpg_check: yes
+      when: ansible_facts['distribution_major_version'] == "8"
+    - name: Start Zabbix Agent Service on all target hosts
+      service:
+        name: zabbix-agent
+        state: restarted
+        enabled: yes
+    - name: Remove binary files from Ubuntu
+      file:
+        path: /root/zabbix-agent_6.0.3-1+ubuntu22.04_amd64.deb
+        state: absent
+      when: ansible_facts['distribution_major_version'] == "22"
+    - name: Remove binary files from RHEL
+      file:
+        path: /root/zabbix-agent-6.0.3-1.el8.x86_64.rpm
+        state: absent
+      when: ansible_facts['distribution_major_version'] == "8"
+
